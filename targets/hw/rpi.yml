@@ -6,9 +6,6 @@ name: "Raspberry Pi 3 & 4"
 arch: "arm64"
 
 create_img:
-  - mkimg: "{{ output }}"
-    size: 3000M
-
   - mklabel: msdos
     device: "{{ output }}"
 

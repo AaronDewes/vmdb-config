@@ -1,9 +1,5 @@
-# SPDX-FileCopyrightText: 2021 Aaron Dewes
-#
-# SPDX-License-Identifier: GPL-3.0-or-later
-
 steps:
-- mkimg: '{{ output }}'
+- mkimg: \{\{output\}\}
   size: 4G
 - device: '{{ output }}'
   mklabel: msdos

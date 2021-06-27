@@ -5,9 +5,6 @@
 name: "AMD64 (BIOS)"
 
 create_img:
-  - mkimg: "{{ output }}"
-    size: 4G
-
   - mklabel: msdos
     device: "{{ output }}"
 

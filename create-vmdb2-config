@@ -19,6 +19,9 @@ parser.add_argument("-t", "--target", type=str, required=True,
 parser.add_argument("-o", "--output", type=str, required=True,
                     default='result.yml',
                     help="Where to store the resulting config file for vmdb2")
+parser.add_argument("-s", "--size", type=str,
+                    default='4G',
+                    help="The size of the target image")
 
 args = parser.parse_args()
 
@@ -53,7 +56,9 @@ except:
     exit(1)
 
 computed_result: dict = {}
-final_steps: ArrayType = hw_target["create_img"]
+final_steps: ArrayType = []
+final_steps = [{"mkimg": '{{ output }}', "size": args.size}]
+final_steps.extend(hw_target["create_img"])
 final_steps.append({"unpack-rootfs": "/"})
 final_steps.extend(optimizeSteps(prepare_target["steps"]))
 final_steps.extend(optimizeSteps(hw_target["pre_cache"]))
