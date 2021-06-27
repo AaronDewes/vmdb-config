@@ -1,0 +1,28 @@
+# SPDX-FileCopyrightText: 2021 Aaron Dewes
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+steps:
+  # Clean up archive cache (likely not useful) and lists (likely outdated) to
+  # reduce image size by several hundred megabytes.
+  - chroot: /
+    shell: |
+      apt-get clean
+      rm -rf /var/lib/apt/lists
+
+  # TODO(https://github.com/larswirzenius/vmdb2/issues/24): remove once vmdb
+  # clears /etc/resolv.conf on its own.
+  - shell: 'rm "${ROOT?}/etc/resolv.conf"'
+    root-fs: /
+
+  # Clear /etc/machine-id and /var/lib/dbus/machine-id, as both should
+  # be auto-generated upon first boot. From the manpage
+  # (machine-id(5)):
+  #
+  #   For normal operating system installations, where a custom image is
+  #   created for a specific machine, /etc/machine-id should be
+  #   populated during installation.
+  #
+  # Note this will also trigger ConditionFirstBoot=yes for systemd.
+  - chroot: /
+    shell: 'rm -f /etc/machine-id /var/lib/dbus/machine-id'

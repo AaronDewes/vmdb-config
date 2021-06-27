@@ -1,0 +1,46 @@
+# SPDX-FileCopyrightText: 2021 Aaron Dewes
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+name: "AMD64 (BIOS)"
+
+create_img:
+  - mkimg: "{{ output }}"
+    size: 4G
+
+  - mklabel: msdos
+    device: "{{ output }}"
+
+  - mkpart: primary
+    device: "{{ output }}"
+    start: 0%
+    end: 50%
+    tag: /
+
+  - kpartx: "{{ output }}"
+
+  - mkfs: ext4
+    partition: /
+
+  - mount: /
+
+  - unpack-rootfs: /
+
+pre_cache:
+  - apt: install
+    packages:
+    - linux-image-amd64
+    tag: /
+
+post_cache:
+  - fstab: /
+
+  - chroot: /
+    shell: |
+      sed -i 's,^root:[^:]*:,root::,' /etc/passwd
+
+  - resize-rootfs: /
+
+  - grub: bios
+    tag: /
+    quiet: false
