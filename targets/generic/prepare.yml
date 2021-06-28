@@ -3,14 +3,6 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 steps:
-  - debootstrap: bullseye
-    mirror: http://deb.debian.org/debian
-    target: /
-    components:
-    - main
-    - contrib
-    - non-free
-
   # Create a generic sources.list
   - create-file: /etc/apt/sources.list
     trailing-newline: '1'

@@ -8,6 +8,7 @@ from array import ArrayType
 import yaml
 import argparse
 from os import path
+
 script_path = path.realpath(path.dirname(__file__))
 
 parser = argparse.ArgumentParser(description='Create config file for vmdb2.')
@@ -55,11 +56,14 @@ except:
     print("Error: Couldn't find bootstrap script")
     exit(1)
 
+print("Generating config for {}".format(hw_target["name"]))
 computed_result: dict = {}
 final_steps: ArrayType = []
 final_steps = [{"mkimg": '{{ output }}', "size": args.size}]
 final_steps.extend(hw_target["create_img"])
 final_steps.append({"unpack-rootfs": "/"})
+final_steps.extend(optimizeSteps([{"debootstrap": "bullseye", "arch": hw_target["arch"], "components": [
+                   "main", "contrib", "non-free"], "mirror": "http://deb.debian.org/debian", "target": "/"}]))
 final_steps.extend(optimizeSteps(prepare_target["steps"]))
 final_steps.extend(optimizeSteps(hw_target["pre_cache"]))
 final_steps.append({"cache-rootfs": "/", "unless": "rootfs_unpacked"})
@@ -70,7 +74,7 @@ final_steps.extend(cleanup_target["steps"])
 
 computed_result["steps"] = final_steps
 
-result = yaml.dump(computed_result)
+result = yaml.dump(computed_result, sort_keys=False)
 
 f = open(args.output, "w")
 f.write(result)

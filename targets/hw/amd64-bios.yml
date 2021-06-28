@@ -3,6 +3,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 name: "AMD64 (BIOS)"
+arch: "amd64"
 
 create_img:
   - mklabel: msdos

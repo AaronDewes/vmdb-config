@@ -2,7 +2,7 @@
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-name: "Raspberry Pi 3 & 4"
+name: "Raspberry Pi 3, 4 and 400"
 arch: "arm64"
 
 create_img:

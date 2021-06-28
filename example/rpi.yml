@@ -1,44 +1,43 @@
-# SPDX-FileCopyrightText: 2021 Aaron Dewes
-#
-# SPDX-License-Identifier: GPL-3.0-or-later
-
 steps:
 - mkimg: '{{ output }}'
-  size: 4G
-- device: '{{ output }}'
-  mklabel: msdos
-- device: '{{ output }}'
-  end: 20%
+  size: 5G
+- mklabel: msdos
+  device: '{{ output }}'
+- mkpart: primary
   fs-type: fat32
-  mkpart: primary
+  device: '{{ output }}'
   start: 4MiB
+  end: 20%
   tag: /boot
-- device: '{{ output }}'
-  end: 100%
-  mkpart: primary
+- mkpart: primary
+  device: '{{ output }}'
   start: 20%
+  end: 100%
   tag: /
 - kpartx: '{{ output }}'
-- label: RASPIFIRM
-  mkfs: vfat
+- mkfs: vfat
   partition: /boot
-- label: RASPIROOT
-  mkfs: ext4
+  label: RASPIFIRM
+- mkfs: ext4
   partition: /
+  label: RASPIROOT
 - mount: /
-- dirname: /boot/firmware
-  mount: /boot
+- mount: /boot
   mount-on: /
+  dirname: /boot/firmware
 - unpack-rootfs: /
-- components:
+- debootstrap: bullseye
+  arch: arm64
+  components:
   - main
   - contrib
   - non-free
-  debootstrap: bullseye
   mirror: http://deb.debian.org/debian
   target: /
   unless: rootfs_unpacked
-- contents: 'deb http://deb.debian.org/debian bullseye main contrib non-free
+- create-file: /etc/apt/sources.list
+  trailing-newline: '1'
+  contents: 'deb http://deb.debian.org/debian bullseye main contrib non-free
 
     deb http://security.debian.org/debian-security bullseye-security main contrib
     non-free
@@ -50,19 +49,17 @@ steps:
     # deb http://deb.debian.org/debian bullseye-backports main contrib non-free
 
     '
-  create-file: /etc/apt/sources.list
-  trailing-newline: '1'
   unless: rootfs_unpacked
 - chroot: /
   shell: apt-get update
   unless: rootfs_unpacked
 - copy-file: /etc/initramfs-tools/hooks/rpi-resizerootfs
-  perm: '0755'
   src: rootfs/etc/initramfs-tools/hooks/rpi-resizerootfs
+  perm: '0755'
   unless: rootfs_unpacked
 - copy-file: /etc/initramfs-tools/scripts/local-bottom/rpi-resizerootfs
-  perm: '0755'
   src: rootfs/etc/initramfs-tools/scripts/local-bottom/rpi-resizerootfs
+  perm: '0755'
   unless: rootfs_unpacked
 - apt: install
   packages:
@@ -74,8 +71,7 @@ steps:
   unless: rootfs_unpacked
 - cache-rootfs: /
   unless: rootfs_unpacked
-- root-fs: /
-  shell: 'install -m 644 -o root -g root rootfs/etc/fstab "${ROOT?}/etc/fstab"
+- shell: 'install -m 644 -o root -g root rootfs/etc/fstab "${ROOT?}/etc/fstab"
 
 
     install -m 644 -o root -g root rootfs/etc/network/interfaces.d/eth0 "${ROOT?}/etc/network/interfaces.d/eth0"
@@ -118,6 +114,7 @@ steps:
     rm -f "${ROOT?}"/etc/ssh/ssh_host_*_key*
 
     '
+  root-fs: /
   unless: rootfs_unpacked
 - chroot: /
   shell: 'install -m 644 -o root -g root /usr/lib/linux-image-*-arm64/broadcom/bcm*rpi*.dtb
@@ -152,7 +149,7 @@ steps:
     rm -rf /var/lib/apt/lists
 
     '
-- root-fs: /
-  shell: rm "${ROOT?}/etc/resolv.conf"
+- shell: rm "${ROOT?}/etc/resolv.conf"
+  root-fs: /
 - chroot: /
   shell: rm -f /etc/machine-id /var/lib/dbus/machine-id
