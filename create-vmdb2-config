@@ -71,7 +71,7 @@ final_steps.extend(optimizeSteps(prepare_target["steps"]))
 final_steps.extend(optimizeSteps(hw_target["pre_cache"]))
 final_steps.append({"cache-rootfs": "/", "unless": "rootfs_unpacked"})
 final_steps.extend(optimizeSteps(hw_target["post_cache"]))
-final_steps.extend(optimizeSteps([{"create-file": args.file}]))
+final_steps.extend(optimizeSteps([{"chroot": "/", "shell": "touch '{}'".format(args.file)}]))
 final_steps.extend(optimizeSteps([{"copy-file": "/bootstrap.sh", "src": path.realpath(
     args.script)}, {"chroot": "/", "shell": "/bootstrap.sh"}]))
 final_steps.extend(cleanup_target["steps"])
