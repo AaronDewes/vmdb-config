@@ -55,11 +55,11 @@ steps:
   unless: rootfs_unpacked
 - copy-file: /etc/initramfs-tools/hooks/rpi-resizerootfs
   src: rootfs/etc/initramfs-tools/hooks/rpi-resizerootfs
-  perm: '0755'
+  perm: 0755
   unless: rootfs_unpacked
 - copy-file: /etc/initramfs-tools/scripts/local-bottom/rpi-resizerootfs
   src: rootfs/etc/initramfs-tools/scripts/local-bottom/rpi-resizerootfs
-  perm: '0755'
+  perm: 0755
   unless: rootfs_unpacked
 - apt: install
   packages:
