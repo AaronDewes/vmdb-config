@@ -50,12 +50,19 @@ pre_cache:
 
   - apt: install
     packages:
-    - wpasupplicant
-    - raspi-firmware
     - linux-image-arm64
-    - firmware-brcm80211
     tag: /
 
+  - apt: install
+    packages:
+    - raspi-firmware
+    tag: /
+
+  - apt: install
+    packages:
+    - wpasupplicant
+    - firmware-brcm80211
+    tag: /
 
 post_cache:
   - shell: |
